@@ -1,11 +1,15 @@
 """
 main.py
 
-Ties the full live pipeline together:
-  ESP32-CAM Wi-Fi stream -> detect -> track -> count -> display
+Ties the full pipeline together:
+  video source (webcam or ESP32-CAM stream) -> detect -> track -> count -> display
 
 Usage:
-    python src/main.py --stream-url http://192.168.4.1:81/stream
+    # Test with laptop webcam (default):
+    python src/main.py --source 0
+
+    # Once you have the drone's camera:
+    python src/main.py --source http://192.168.4.1:81/stream
 """
 
 import argparse
@@ -29,16 +33,19 @@ def draw_overlays(frame, current_frame_ids, count):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Live drone person counting pipeline")
-    parser.add_argument("--stream-url", required=True,
-                         help="ESP32-CAM MJPEG stream URL, e.g. http://192.168.4.1:81/stream")
+    parser = argparse.ArgumentParser(description="Live person counting pipeline")
+    parser.add_argument("--source", default="0",
+                         help="Video source: webcam index (e.g. 0) or a stream URL "
+                              "(e.g. http://192.168.4.1:81/stream)")
     parser.add_argument("--model", default="yolov8n.pt", help="YOLO model weights to use")
     parser.add_argument("--confidence", type=float, default=0.5, help="Detection confidence threshold")
     args = parser.parse_args()
 
-    reader = StreamReader(args.stream_url)
+    source = int(args.source) if args.source.isdigit() else args.source
+
+    reader = StreamReader(source)
     if not reader.open():
-        print(f"Could not open stream: {args.stream_url}")
+        print(f"Could not open source: {source}")
         return
 
     detector = PersonDetector(model_path=args.model, confidence=args.confidence)
@@ -52,7 +59,7 @@ def main():
         count = counter.update(current_frame_ids)
 
         frame = draw_overlays(frame, current_frame_ids, count)
-        cv2.imshow("Drone Person Counter", frame)
+        cv2.imshow("Person Counter", frame)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break

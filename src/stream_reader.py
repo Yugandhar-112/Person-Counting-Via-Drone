@@ -1,28 +1,30 @@
 """
 stream_reader.py
 
-Connects to the drone's Wi-Fi camera (e.g. an ESP32-CAM MJPEG stream) and
-yields video frames for the rest of the pipeline to consume.
+Connects to a video source and yields frames for the rest of the pipeline
+to consume. Works with either:
+  - a laptop webcam (pass an integer device index, e.g. 0)
+  - a live network stream, e.g. an ESP32-CAM MJPEG stream URL
 """
 
 import cv2
 
 
 class StreamReader:
-    """Wraps cv2.VideoCapture to read a live MJPEG/HTTP video stream."""
+    """Wraps cv2.VideoCapture to read frames from a webcam or a stream URL."""
 
-    def __init__(self, stream_url: str):
+    def __init__(self, source):
         """
         Args:
-            stream_url: URL of the camera's video stream,
-                e.g. "http://192.168.4.1:81/stream" for a typical ESP32-CAM.
+            source: int (webcam device index, e.g. 0) or str (stream URL,
+                e.g. "http://192.168.4.1:81/stream" for a typical ESP32-CAM).
         """
-        self.stream_url = stream_url
+        self.source = source
         self.capture = None
 
     def open(self) -> bool:
-        """Open the connection to the stream. Returns True on success."""
-        self.capture = cv2.VideoCapture(self.stream_url)
+        """Open the connection to the source. Returns True on success."""
+        self.capture = cv2.VideoCapture(self.source)
         return self.capture.isOpened()
 
     def read_frame(self):
@@ -32,7 +34,7 @@ class StreamReader:
         return self.capture.read()
 
     def frames(self):
-        """Generator that yields frames until the stream ends or errors."""
+        """Generator that yields frames until the source ends or errors."""
         if self.capture is None:
             raise RuntimeError("Stream not opened. Call open() first.")
         while True:
@@ -48,20 +50,22 @@ class StreamReader:
 
 
 if __name__ == "__main__":
-    # Quick manual test: point this at your ESP32-CAM stream URL and confirm
-    # frames are coming through before wiring in detection/tracking.
+    # Quick manual test: defaults to webcam 0. Pass a stream URL instead to
+    # test against an ESP32-CAM, e.g.:
+    #   python stream_reader.py http://192.168.4.1:81/stream
     import sys
 
-    url = sys.argv[1] if len(sys.argv) > 1 else "http://192.168.4.1:81/stream"
-    reader = StreamReader(url)
+    arg = sys.argv[1] if len(sys.argv) > 1 else "0"
+    source = int(arg) if arg.isdigit() else arg
+    reader = StreamReader(source)
 
     if not reader.open():
-        print(f"Failed to open stream at {url}")
+        print(f"Failed to open source: {source}")
         sys.exit(1)
 
-    print(f"Connected to {url}. Press 'q' to quit.")
+    print(f"Connected to {source}. Press 'q' to quit.")
     for frame in reader.frames():
-        cv2.imshow("Drone Stream", frame)
+        cv2.imshow("Video Source", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
