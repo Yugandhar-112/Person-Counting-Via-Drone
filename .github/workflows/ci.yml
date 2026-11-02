@@ -30,3 +30,4 @@ jobs:
       run: |
         python -c "import src; print('Package imported successfully')"
         python -c "import src.config; import src.detector; import src.tracker; import src.counter; import src.motion_compensation; import src.evaluation; print('All core modules imported successfully')"
+
