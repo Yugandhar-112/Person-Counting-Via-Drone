@@ -1,27 +1,43 @@
-# Python
+# Python bytecode and environments
 __pycache__/
 *.py[cod]
+*$py.class
 *.egg-info/
+dist/
+build/
 venv/
 .venv/
+env/
 
 # Environment / secrets
 .env
+.env.local
 
-# Model weights (large files - don't commit)
+# Model weights (large files - automatically downloaded by Ultralytics)
 *.pt
 *.onnx
+*.engine
 weights/
 
-# Video/image test data
+# Video/image test data (exclude large binaries, retain directory structure)
 *.mp4
 *.avi
+*.mov
+*.mkv
 sample_data/
+test_clips/*
+!test_clips/.gitkeep
 
-# OS
+# Ground truth annotations & run logs
+ground_truth/*
+!ground_truth/.gitkeep
+logs/*
+!logs/.gitkeep
+
+# OS and Editor artifacts
 .DS_Store
 Thumbs.db
-
-# Editors
 .vscode/
 .idea/
+*.swp
+*.swo

@@ -1,0 +1,32 @@
+name: AeroStreamID CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Check Python syntax & imports
+      run: |
+        python -c "import src; print('Package imported successfully')"
+        python -c "import src.config; import src.detector; import src.tracker; import src.counter; import src.motion_compensation; import src.evaluation; print('All core modules imported successfully')"

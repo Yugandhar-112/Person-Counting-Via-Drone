@@ -1,3 +1,8 @@
+# Core Computer Vision & Deep Learning
 opencv-python>=4.9.0
 ultralytics>=8.2.0
 numpy>=1.26.0
+
+# Evaluation, Benchmarking & Visualizations
+matplotlib>=3.8.0
+scipy>=1.12.0

@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aerostream-id"
+version = "0.1.0"
+description = "Off-board real-time person identification and counting pipeline for Wi-Fi connected UAVs with ego-motion compensation"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "AeroStreamID Team" }
+]
+keywords = [
+    "drone",
+    "uav",
+    "computer-vision",
+    "multi-object-tracking",
+    "ego-motion-compensation",
+    "yolov8",
+    "person-counting",
+    "esp32-cam"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "opencv-python>=4.9.0",
+    "ultralytics>=8.2.0",
+    "numpy>=1.26.0",
+    "matplotlib>=3.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "scipy>=1.12.0",
+    "flake8>=6.0.0",
+    "pytest>=7.0.0",
+]
+
+[project.scripts]
+aerostream = "src.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
